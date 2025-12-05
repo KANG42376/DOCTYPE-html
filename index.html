@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神人算法</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #4a148c;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #eaeaea;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4a148c;
+            display: flex;
+            align-items: center;
+        }
+
+        h2 i {
+            margin-right: 10px;
+            color: #4a148c;
+        }
+
+        h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .config-section {
+            background-color: #f8f9fa;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .customer-id-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .customer-id-group label {
+            margin-bottom: 0;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        .customer-id-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #4a148c;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #2c3e50;
+            background-color: white;
+        }
+
+        .customer-id-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 20, 140, 0.1);
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #4a148c;
+        }
+
+        .price-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .price-card {
+            background-color: white;
+            border: 2px solid #eaeaea;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .price-card:hover {
+            border-color: #4a148c;
+            background-color: #f9f9f9;
+        }
+
+        .price-card.selected {
+            border-color: #4a148c;
+            background-color: #f3f4f9;
+            box-shadow: 0 0 0 1px rgba(74, 20, 140, 0.2);
+        }
+
+        .price-card-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+        }
+
+        .price-card-amount {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .price-card-unit {
+            color: #7f8c8d;
+            font-size: 0.8rem;
+            margin-left: 2px;
+        }
+
+        .extra-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 480px) {
+            .extra-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .extra-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .extra-option input[type="number"] {
+            width: 70px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .checkbox-group input {
+            width: auto;
+        }
+
+        .discount-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+            align-items: center;
+        }
+
+        .discount-input-group {
+            display: none;
+            grid-column: 1 / -1;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .discount-input-group.show {
+            display: flex;
+        }
+
+        .discount-input-group input {
+            width: 80px;
+        }
+
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #4a148c;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #5c1fa3;
+        }
+
+        .btn-secondary {
+            background-color: #ecf0f1;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d5dbdb;
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #219653;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .result-section {
+            background-color: #f8f9fa;
+        }
+
+        .result-box {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: white;
+            border: 2px solid #4a148c;
+        }
+
+        .result-label {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .result-amount {
+            font-size: 2.5rem;
+            color: #e74c3c;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .result-details {
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9rem;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .customer-id-result {
+            background-color: #f0f0f0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-left: 3px solid #4a148c;
+        }
+
+        .orders-section {
+            background-color: #f8f9fa;
+        }
+
+        .orders-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-info {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .order-customer {
+            font-weight: bold;
+            color: #4a148c;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+
+        .order-details {
+            color: #666;
+        }
+
+        .order-price {
+            color: #27ae60;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1rem;
+        }
+
+        .remove-order {
+            color: #e74c3c;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .orders-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            margin-top: 10px;
+            border-top: 2px solid #eee;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .history-section {
+            background-color: #f8f9fa;
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+
+        .history-item {
+            background-color: white;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4a148c;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .history-time {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+        }
+
+        .history-price {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .history-details {
+            color: #555;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .customer-tag {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .empty-history {
+            text-align: center;
+            color: #95a5a6;
+            padding: 30px 20px;
+            font-size: 0.9rem;
+        }
+
+        .price-section {
+            background-color: #f8f9fa;
+        }
+
+        .price-summary {
+            margin-top: 10px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        .price-row:last-child {
+            border-bottom: none;
+        }
+
+        .price-row.header {
+            font-weight: bold;
+            color: #2c3e50;
+            background-color: #f0f0f0;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin: 0 -10px;
+            border-radius: 4px;
+        }
+
+        .price-category {
+            margin-bottom: 15px;
+        }
+
+        .category-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .new-feature-note {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            border-left: 3px solid #4caf50;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .price-cards {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .discount-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>VLK单价计算神器😋</h1>
+        <p class="subtitle">唐逼专用 · 神人专用 · 小白专用</p>
+    </header>
+
+    <div class="main-content">
+        <div class="left-column">
+            <div class="card config-section">
+                <h2><i class="fas fa-cog"></i> 配置</h2>
+
+                <div class="customer-id-group">
+                    <label for="customerId">老板微信ID:</label>
+                    <input type="text" id="customerId" class="customer-id-input" placeholder="请输入老板微信ID" value="">
+                </div>
+
+                <div class="form-group">
+                    <label for="serviceType">陪玩类型</label>
+                    <select id="serviceType">
+                        <option value="male_tech">男技术</option>
+                        <option value="female_tech">女技术</option>
+                        <option value="male_fun">男娱乐</option>
+                        <option value="female_fun">女娱乐</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="billingType">计费方式</label>
+                    <select id="billingType">
+                        <option value="perGame">局单</option>
+                        <option value="perHour">小时单</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity" id="quantityLabel">数量</label>
+                    <input type="number" id="quantity" min="1" value="1">
+                </div>
+
+                <div class="price-cards" id="priceCards">
+                </div>
+
+                <div class="extra-options" id="extraOptions">
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="oneForFour">
+                    <label for="oneForFour">1 陪 4</label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="isForeignServer">
+                    <label for="isForeignServer">外服平台（+5/g、+10/h）</label>
+                </div>
+
+                <div class="discount-group">
+                    <div>
+                        <label for="discountOption">折扣选项</label>
+                        <select id="discountOption">
+                            <option value="no">无折扣</option>
+                            <option value="yes">有折扣</option>
+                        </select>
+                    </div>
+
+                    <div class="discount-input-group" id="discountInputGroup">
+                        <label for="discountPercent">折扣:</label>
+                        <input type="number" id="discountPercent" min="1" max="100" value="80">
+                        <span>%</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="calculateBtn">计算当前单价</button>
+                    <button class="btn btn-success" id="addToOrderBtn">添加到结算</button>
+                </div>
+            </div>
+
+            <div class="card result-section">
+                <h2><i class="fas fa-calculator"></i> 单价结算</h2>
+
+                <div class="result-box">
+                    <div class="result-label">总计</div>
+                    <div class="result-amount" id="totalAmount">0 元</div>
+                </div>
+            </div>
+
+            <div class="card orders-section">
+                <h2><i class="fas fa-shopping-cart"></i> 当前单</h2>
+
+                <div class="orders-list" id="ordersList">
+                </div>
+
+                <div class="orders-total">
+                    <span>订单总计:</span>
+                    <span id="ordersTotal">0 元</span>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="saveOrderBtn">保存</button>
+                    <button class="btn btn-danger" id="clearOrderBtn">清空</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-column">
+            <div class="card history-section">
+                <h2><i class="fas fa-history"></i> 历史</h2>
+
+                <div class="history-list" id="historyList">
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="clearHistoryBtn">清空</button>
+                </div>
+            </div>
+
+            <div class="card price-section">
+                <h2><i class="fas fa-table"></i> 价格表</h2>
+
+                <div class="price-summary">
+                    <div class="price-category">
+                        <div class="category-title">男技术陪</div>
+                        <div class="price-row header">
+                            <span> 分段</span>
+                            <span> 价格</span>
+                        </div>
+                        <div class="price-row">
+                            <span>B+以下</span>
+                            <span>30元/局 | 55元/小时</span>
+                        </div>
+                        <div class="price-row">
+                            <span>B+分段</span>
+                            <span>35元/局 | 65元/小时</span>
+                        </div>
+                        <div class="price-row">
+                            <span>A分段</span>
+                            <span>45元/局 | 85元/小时</span>
+                        </div>
+                        <div class="price-row">
+                            <span>A+分段</span>
+                            <span>60元/局</span>
+                        </div>
+                        <div class="price-row">
+                            <span>普S</span>
+                            <span>75元/局</span>
+                        </div>
+                    </div>
+
+                    <div class="price-category">
+                        <div class="category-title">女技术陪</div>
+                        <div class="price-row header">
+                            <span>分段</span>
+                            <span>价格</span>
+                        </div>
+                        <div class="price-row">
+                            <span>B+以下</span>
+                            <span>35元/局 | 65元/小时</span>
+                        </div>
+                        <div class="price-row">
+                            <span>B+分段</span>
+                            <span>45元/局 | 85元/小时</span>
+                        </div>
+                        <div class="price-row">
+                            <span>A分段</span>
+                            <span>55元/局 | 100元/小时</span>
+                        </div>
+                        <div class="price-row">
+                            <span>A+分段</span>
+                            <span>70元/局</span>
+                        </div>
+                        <div class="price-row">
+                            <span>普S</span>
+                            <span>90元/局</span>
+                        </div>
+                    </div>
+
+                    <div class="price-category">
+                        <div class="category-title">男娱乐陪</div>
+                        <div class="price-row header">
+                            <span>分段</span>
+                            <span>价格</span>
+                        </div>
+                        <div class="price-row">
+                            <span>B+以下</span>
+                            <span>25元/局 | 45元/小时</span>
+                        </div>
+                        <div class="price-row">
+                            <span>B+分段</span>
+                            <span>30元/局 | 55元/小时</span>
+                        </div>
+                        <div class="price-row">
+                            <span>A分段</span>
+                            <span>40元/局 | 75元/小时</span>
+                        </div>
+                        <div class="price-row">
+                            <span>A+以上</span>
+                            <span>50元/局</span>
+                        </div>
+                    </div>
+
+                    <div class="price-category">
+                        <div class="category-title">女娱乐陪</div>
+                        <div class="price-row header">
+                            <span>分段</span>
+                            <span>价格</span>
+                        </div>
+                        <div class="price-row">
+                            <span>B+以下</span>
+                            <span>30元/局 | 55元/小时</span>
+                        </div>
+                        <div class="price-row">
+                            <span>B+分段</span>
+                            <span>35元/局 | 65元/小时</span>
+                        </div>
+                        <div class="price-row">
+                            <span>A分段</span>
+                            <span>45元/局 | 85元/小时</span>
+                        </div>
+                        <div class="price-row">
+                            <span>A+以上</span>
+                            <span>60元/局</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const priceData = {
+        male_tech: {
+            name: "男技术",
+            ranks: ["B+以下", "B+分段", "A分段", "A+分段", "普S"],
+            perGame: [30, 35, 45, 60, 75],
+            perHour: [55, 65, 85, null, null]
+        },
+        female_tech: {
+            name: "女技术",
+            ranks: ["B+以下", "B+分段", "A分段", "A+分段", "普S"],
+            perGame: [35, 45, 55, 70, 90],
+            perHour: [65, 85, 100, null, null]
+        },
+        male_fun: {
+            name: "男娱乐",
+            ranks: ["B+以下", "B+分段", "A分段", "A+以上"],
+            perGame: [25, 30, 40, 50],
+            perHour: [45, 55, 75, null]
+        },
+        female_fun: {
+            name: "女娱乐",
+            ranks: ["B+以下", "B+分段", "A分段", "A+以上"],
+            perGame: [30, 35, 45, 60],
+            perHour: [55, 65, 85, null]
+        }
+    };
+
+    let currentOrder = [];
+    let history = [];
+    let currentOrderId = 1;
+
+    const customerIdInput = document.getElementById('customerId');
+    const serviceTypeSelect = document.getElementById('serviceType');
+    const billingTypeSelect = document.getElementById('billingType');
+    const quantityInput = document.getElementById('quantity');
+    const quantityLabel = document.getElementById('quantityLabel');
+    const priceCardsContainer = document.getElementById('priceCards');
+    const extraOptionsContainer = document.getElementById('extraOptions');
+    const oneForFourCheckbox = document.getElementById('oneForFour');
+    const isForeignServerCheckbox = document.getElementById('isForeignServer');
+    const discountOptionSelect = document.getElementById('discountOption');
+    const discountPercentInput = document.getElementById('discountPercent');
+    const discountInputGroup = document.getElementById('discountInputGroup');
+    const calculateBtn = document.getElementById('calculateBtn');
+    const addToOrderBtn = document.getElementById('addToOrderBtn');
+    const saveOrderBtn = document.getElementById('saveOrderBtn');
+    const clearOrderBtn = document.getElementById('clearOrderBtn');
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    const totalAmountElement = document.getElementById('totalAmount');
+    const ordersListElement = document.getElementById('ordersList');
+    const ordersTotalElement = document.getElementById('ordersTotal');
+    const historyListElement = document.getElementById('historyList');
+
+    function init() {
+        if (sessionStorage.getItem('vlrLastCalculation')) {
+            sessionStorage.removeItem('vlrLastCalculation');
+        }
+
+        loadHistory();
+        updatePriceCards();
+        updateExtraOptions();
+        renderOrders();
+        renderHistory();
+        bindEvents();
+
+        toggleDiscountInput();
+
+        resetCalculationResult();
+
+        oneForFourCheckbox.checked = false;
+        isForeignServerCheckbox.checked = false;
+        discountOptionSelect.value = 'no';
+        discountInputGroup.classList.remove('show');
+
+        quantityInput.value = 1;
+    }
+
+    function resetCalculationResult() {
+        totalAmountElement.textContent = '0 元';
+    }
+
+    function bindEvents() {
+        serviceTypeSelect.addEventListener('change', function() {
+            updatePriceCards();
+            resetCalculationResult();
+        });
+
+        billingTypeSelect.addEventListener('change', function() {
+            updateExtraOptions();
+            resetCalculationResult();
+        });
+
+        discountOptionSelect.addEventListener('change', toggleDiscountInput);
+        calculateBtn.addEventListener('click', calculate);
+        addToOrderBtn.addEventListener('click', addToOrder);
+        clearOrderBtn.addEventListener('click', clearOrders);
+        saveOrderBtn.addEventListener('click', saveOrder);
+        clearHistoryBtn.addEventListener('click', clearHistory);
+
+        quantityInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculate();
+        });
+
+        const savedCustomerId = localStorage.getItem('vlrCustomerId');
+        if (savedCustomerId) {
+            customerIdInput.value = savedCustomerId;
+        }
+
+        customerIdInput.addEventListener('change', function() {
+            localStorage.setItem('vlrCustomerId', this.value);
+        });
+    }
+
+    function toggleDiscountInput() {
+        if (discountOptionSelect.value === 'yes') {
+            discountInputGroup.classList.add('show');
+        } else {
+            discountInputGroup.classList.remove('show');
+        }
+    }
+
+    function updatePriceCards() {
+        const type = serviceTypeSelect.value;
+        const isHourly = billingTypeSelect.value === 'perHour';
+        const data = priceData[type];
+
+        priceCardsContainer.innerHTML = '';
+
+        data.ranks.forEach((rank, index) => {
+            const price = isHourly ? data.perHour[index] : data.perGame[index];
+
+            if (price === null) return;
+
+            const card = document.createElement('div');
+            card.className = 'price-card';
+            card.dataset.rankIndex = index;
+
+            card.innerHTML = `
+                <div class="price-card-title">${rank}</div>
+                <div class="price-card-amount">${price}<span class="price-card-unit">元/${isHourly ? '小时' : '局'}</span></div>
+            `;
+
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.price-card').forEach(c => {
+                    c.classList.remove('selected');
+                });
+
+                this.classList.add('selected');
+
+                setTimeout(calculate, 100);
+            });
+
+            priceCardsContainer.appendChild(card);
+        });
+
+        if (priceCardsContainer.firstChild) {
+            priceCardsContainer.firstChild.classList.add('selected');
+        }
+    }
+
+    function updateExtraOptions() {
+        const isHourly = billingTypeSelect.value === 'perHour';
+
+        if (isHourly) {
+            quantityLabel.textContent = "小时数";
+            extraOptionsContainer.innerHTML = `
+                <div class="extra-option">
+                    <label>超时分钟:</label>
+                    <input type="number" id="extraMinutes" min="0" value="0">
+                </div>
+                <div style="grid-column: 1 / -1; font-size: 0.85rem; color: #666;">
+                    ---------------------------------------------------------------------------------------------
+                </div>
+            `;
+        } else {
+            quantityLabel.textContent = "局数";
+            extraOptionsContainer.innerHTML = `
+                <div class="extra-option">
+                    <label>加时赛轮数:</label>
+                    <input type="number" id="overtimeRounds" min="0" value="0">
+                </div>
+                <div style="grid-column: 1 / -1; font-size: 0.85rem; color: #666;">
+                    ---------------------------------------------------------------------------------------------
+                </div>
+            `;
+        }
+
+        updatePriceCards();
+    }
+
+    function getSelectedRankIndex() {
+        const selectedCard = document.querySelector('.price-card.selected');
+        if (selectedCard) {
+            return parseInt(selectedCard.dataset.rankIndex);
+        }
+        return 0;
+    }
+
+    function calculate() {
+        const customerId = customerIdInput.value.trim() || '未指定老板';
+        const type = serviceTypeSelect.value;
+        const rankIndex = getSelectedRankIndex();
+        const isHourly = billingTypeSelect.value === 'perHour';
+        const quantity = parseInt(quantityInput.value) || 0;
+        const isOneForFour = oneForFourCheckbox.checked;
+        const isForeignServer = isForeignServerCheckbox.checked;
+        const hasDiscount = discountOptionSelect.value === 'yes';
+        const discountPercent = hasDiscount ? parseFloat(discountPercentInput.value) || 100 : 100;
+
+        const data = priceData[type];
+
+        if (quantity <= 0) {
+            alert('无效数据，你个傻逼');
+            return;
+        }
+
+        if (hasDiscount && (discountPercent < 1 || discountPercent > 100)) {
+            alert('傻逼！折扣无效！');
+            return;
+        }
+
+        let basePrice, extraPrice = 0, oneForFourPrice = 0, foreignServerPrice = 0;
+
+        if (isHourly) {
+            basePrice = data.perHour[rankIndex];
+
+            if (basePrice === null) {
+                alert('该分段不支持小时单啊，你个傻逼');
+                return;
+            }
+
+            const hourTotal = basePrice * quantity;
+
+            const extraMinutesInput = document.getElementById('extraMinutes');
+            const extraMinutes = parseInt(extraMinutesInput?.value) || 0;
+
+            if (extraMinutes > 40) {
+                extraPrice = basePrice * 1;
+            } else if (extraMinutes > 20) {
+                extraPrice = basePrice * 0.5;
+            }
+
+            if (isOneForFour) {
+                oneForFourPrice = 20;
+            }
+
+            if (isForeignServer) {
+                foreignServerPrice = 10 * quantity;
+            }
+
+        } else {
+            basePrice = data.perGame[rankIndex];
+            const gameTotal = basePrice * quantity;
+
+            const overtimeInput = document.getElementById('overtimeRounds');
+            const overtimeRounds = parseInt(overtimeInput?.value) || 0;
+
+            if (overtimeRounds > 0) {
+                extraPrice = overtimeRounds * 10;
+            }
+
+            if (isOneForFour) {
+                oneForFourPrice = 10;
+            }
+
+            if (isForeignServer) {
+                foreignServerPrice = 5 * quantity;
+            }
+        }
+
+        const subtotal = (isHourly ? (basePrice * quantity) : (basePrice * quantity)) +
+            extraPrice + oneForFourPrice + foreignServerPrice;
+
+        let discountAmount = 0;
+        let finalTotal = subtotal;
+
+        if (hasDiscount && discountPercent < 100) {
+            discountAmount = subtotal * (1 - discountPercent / 100);
+            finalTotal = subtotal - discountAmount;
+        }
+
+        totalAmountElement.textContent = `${finalTotal.toFixed(2)} 元`;
+
+        return {
+            type,
+            typeName: data.name,
+            rankIndex,
+            rankName: data.ranks[rankIndex],
+            isHourly,
+            quantity,
+            isOneForFour,
+            isForeignServer,
+            hasDiscount,
+            discountPercent,
+            customerId: customerId,
+            extra: isHourly ? (document.getElementById('extraMinutes')?.value || 0) :
+                (document.getElementById('overtimeRounds')?.value || 0),
+            basePrice,
+            extraPrice,
+            oneForFourPrice,
+            foreignServerPrice,
+            subtotal,
+            discountAmount,
+            total: finalTotal
+        };
+    }
+
+    function addToOrder() {
+        const result = calculate();
+        if (!result) return;
+
+        const orderItem = {
+            id: currentOrderId++,
+            ...result
+        };
+
+        currentOrder.push(orderItem);
+        renderOrders();
+    }
+
+    function renderOrders() {
+        if (currentOrder.length === 0) {
+            ordersListElement.innerHTML = '<div style="color:#999; text-align:center; padding:20px;">暂无订单项目</div>';
+            ordersTotalElement.textContent = '0 元';
+            return;
+        }
+
+        ordersListElement.innerHTML = '';
+        let total = 0;
+
+        currentOrder.forEach((item, index) => {
+            total += item.total;
+
+            const orderElement = document.createElement('div');
+            orderElement.className = 'order-item';
+
+            let detailsHtml = `
+                <div class="order-customer">老板: ${item.customerId}</div>
+                <div class="order-details">
+                    ${item.typeName} - ${item.rankName} (${item.quantity}${item.isHourly ? '小时' : '局'})
+                    ${item.isOneForFour ? '· 1陪4' : ''}
+                    ${item.isForeignServer ? '· 外服' : ''}
+                    ${item.hasDiscount && item.discountPercent < 100 ? `· ${item.discountPercent}%折扣` : ''}
+                    ${item.extra > 0 ? item.isHourly ? `· 超时${item.extra}分钟` : `· 加时${item.extra}轮` : ''}
+                </div>
+            `;
+
+            orderElement.innerHTML = `
+                <div class="order-info">
+                    ${detailsHtml}
+                </div>
+                <div>
+                    <span class="order-price">${item.total.toFixed(2)}元</span>
+                    <button class="remove-order" data-index="${index}">删除</button>
+                </div>
+            `;
+
+            ordersListElement.appendChild(orderElement);
+        });
+
+        ordersTotalElement.textContent = `${total.toFixed(2)} 元`;
+
+        document.querySelectorAll('.remove-order').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.dataset.index);
+                removeFromOrder(index);
+            });
+        });
+    }
+
+    function removeFromOrder(index) {
+        currentOrder.splice(index, 1);
+        renderOrders();
+    }
+
+    function clearOrders() {
+        if (currentOrder.length === 0) return;
+
+        if (confirm('再次点击确定防呆')) {
+            currentOrder = [];
+            renderOrders();
+        }
+    }
+
+    function saveOrder() {
+        if (currentOrder.length === 0) {
+            alert('傻逼');
+            return;
+        }
+
+        const customerId = customerIdInput.value.trim() || '未指定';
+        const total = currentOrder.reduce((sum, item) => sum + item.total, 0);
+        const orderSummary = currentOrder.map(item =>
+            `${item.typeName} ${item.rankName} ${item.quantity}${item.isHourly ? '小时' : '局'} = ${item.total.toFixed(2)}元`
+        ).join('<br>');
+
+        const historyItem = {
+            id: Date.now(),
+            time: new Date().toLocaleString('zh-CN'),
+            customerId: customerId,
+            items: [...currentOrder],
+            total: total,
+            summary: orderSummary
+        };
+
+        history.unshift(historyItem);
+        saveHistory();
+        renderHistory();
+
+        alert(`已保存 \n老板微信ID：${customerId}\n总计：${total.toFixed(2)}元`);
+
+        currentOrder = [];
+        renderOrders();
+    }
+
+    function renderHistory() {
+        if (history.length === 0) {
+            historyListElement.innerHTML = '<div class="empty-history">暂无历史记录</div>';
+            return;
+        }
+
+        historyListElement.innerHTML = '';
+
+        const recentHistory = history.slice(0, 10);
+
+        recentHistory.forEach(item => {
+            const historyElement = document.createElement('div');
+            historyElement.className = 'history-item';
+            historyElement.innerHTML = `
+                <div class="history-header">
+                    <div class="history-time">${item.time}</div>
+                    <div class="history-price">${item.total.toFixed(2)}元</div>
+                </div>
+                <div class="history-details">
+                    <span class="customer-tag">${item.customerId}</span>
+                    <span>${item.summary.replace(/<br>/g, ' · ')}</span>
+                </div>
+            `;
+
+            historyListElement.appendChild(historyElement);
+        });
+    }
+
+    function clearHistory() {
+        if (history.length === 0) return;
+
+        if (confirm('再次点击确定防呆')) {
+            history = [];
+            saveHistory();
+            renderHistory();
+        }
+    }
+
+    function saveHistory() {
+        localStorage.setItem('vlrOrderHistory', JSON.stringify(history));
+    }
+
+    function loadHistory() {
+        const saved = localStorage.getItem('vlrOrderHistory');
+        if (saved) {
+            history = JSON.parse(saved);
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>
